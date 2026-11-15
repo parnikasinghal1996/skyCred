@@ -234,7 +234,14 @@
     height: 320px;
   }
 
+  /* six swatches in one row are too narrow for words like "Unhealthy": two rows of three, wrapping at spaces only */
+  .legend-swatches {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px 6px;
+  }
+
   .legend-swatch {
-    font-size: 0.66rem;
+    font-size: 0.75rem;
+    overflow-wrap: normal;
   }
 }
