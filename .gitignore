@@ -1,0 +1,14 @@
+# build output
+dist/
+node_modules/
+
+# secrets — never commit a real key (see .env.example)
+.env
+.env.*
+!.env.example
+
+# tooling
+.vercel/
+.claude/
+.DS_Store
+*.log

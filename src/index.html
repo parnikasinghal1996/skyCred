@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SKY CRED — Check the sky's credit score</title>
+  <meta name="description" content="Search any city, see its live weather, and get a plain-language read on whether it is a good time to step out.">
+  <meta name="theme-color" content="#070b16">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to weather</a>
+
+  <div class="app">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand__mark" data-icon="logo"></span>
+        <h1 class="brand__name">SKY CRED</h1>
+      </div>
+      <p class="tagline">Check the sky's credit score before you step out.</p>
+    </header>
+
+    <!-- City search + popular cities (FR-02, FR-03) -->
+    <section class="search-panel" aria-label="Find a city">
+      <form id="search-form" class="search-form" role="search" novalidate>
+        <div class="search-field">
+          <label class="sr-only" for="city-input">City name</label>
+          <span class="search-field__icon" data-icon="search"></span>
+          <input id="city-input" class="search-field__input" type="search" name="city"
+                 placeholder="Search any city" autocomplete="off" autocapitalize="words"
+                 spellcheck="false" enterkeyhint="search" maxlength="100"
+                 aria-describedby="search-message">
+        </div>
+        <button id="search-button" class="btn btn--primary" type="submit">Search</button>
+      </form>
+      <p id="search-message" class="field-message" role="alert" hidden></p>
+
+      <div class="chips-block">
+        <p id="chips-label" class="chips-label">Popular cities</p>
+        <ul id="popular-cities" class="chips" aria-labelledby="chips-label"></ul>
+      </div>
+    </section>
+
+    <main id="main" class="results" tabindex="-1" aria-busy="true">
+      <!-- Shown above valid data when a later request fails (FR-08: never replace valid data) -->
+      <div id="error-banner" class="banner" role="alert" hidden>
+        <span id="banner-icon" class="banner__icon" data-icon="alert-triangle"></span>
+        <div class="banner__text">
+          <p id="banner-title" class="banner__title"></p>
+          <p id="banner-message" class="banner__message"></p>
+        </div>
+        <button id="banner-retry" class="btn btn--small" type="button">Retry</button>
+      </div>
+
+      <!-- Loading placeholder: visible from first paint, before any script runs (FR-01.3) -->
+      <div id="skeleton" class="skeleton-view" role="status">
+        <span class="sr-only">Loading weather…</span>
+        <div class="hero-grid" aria-hidden="true">
+          <div class="card skeleton-card">
+            <span class="skeleton skeleton--line skeleton--w40"></span>
+            <span class="skeleton skeleton--line skeleton--w25"></span>
+            <span class="skeleton skeleton--display"></span>
+          </div>
+          <div class="card skeleton-card">
+            <span class="skeleton skeleton--badge"></span>
+            <span class="skeleton skeleton--line skeleton--w60"></span>
+            <span class="skeleton skeleton--line skeleton--w80"></span>
+          </div>
+        </div>
+        <div class="metrics" aria-hidden="true">
+          <div class="card skeleton-card"><span class="skeleton skeleton--line skeleton--w40"></span><span class="skeleton skeleton--value"></span></div>
+          <div class="card skeleton-card"><span class="skeleton skeleton--line skeleton--w40"></span><span class="skeleton skeleton--value"></span></div>
+          <div class="card skeleton-card"><span class="skeleton skeleton--line skeleton--w40"></span><span class="skeleton skeleton--value"></span></div>
+        </div>
+        <div class="details" aria-hidden="true">
+          <div class="detail"><span class="skeleton skeleton--line skeleton--w40"></span><span class="skeleton skeleton--line skeleton--w60"></span></div>
+          <div class="detail"><span class="skeleton skeleton--line skeleton--w40"></span><span class="skeleton skeleton--line skeleton--w60"></span></div>
+          <div class="detail"><span class="skeleton skeleton--line skeleton--w40"></span><span class="skeleton skeleton--line skeleton--w60"></span></div>
+          <div class="detail"><span class="skeleton skeleton--line skeleton--w40"></span><span class="skeleton skeleton--line skeleton--w60"></span></div>
+          <div class="detail"><span class="skeleton skeleton--line skeleton--w40"></span><span class="skeleton skeleton--line skeleton--w60"></span></div>
+          <div class="detail"><span class="skeleton skeleton--line skeleton--w40"></span><span class="skeleton skeleton--line skeleton--w60"></span></div>
+        </div>
+      </div>
+
+      <!-- Shown instead of the weather card when there is no data yet (FR-08: no blank card) -->
+      <section id="error-panel" class="card error-panel" role="alert" hidden>
+        <span id="error-icon" class="error-panel__icon" data-icon="alert-triangle"></span>
+        <h2 id="error-title" class="error-panel__title"></h2>
+        <p id="error-message" class="error-panel__message"></p>
+        <button id="error-retry" class="btn btn--primary" type="button">Retry</button>
+      </section>
+
+      <!-- Weather (FR-04, FR-05, FR-06) and API response viewer (FR-07). Every value is filled from the API response. -->
+      <div id="weather-content" class="weather-content" hidden>
+        <div id="refresh-indicator" class="refresh-indicator" role="status" hidden>
+          <span class="spinner" aria-hidden="true"></span>
+          <span id="refresh-label"></span>
+        </div>
+
+        <div class="hero-grid refreshable">
+          <section class="card hero-card" aria-labelledby="city-name">
+            <div class="hero-card__top">
+              <div class="place">
+                <p class="eyebrow"><span class="eyebrow__icon" data-icon="map-pin"></span>Current weather</p>
+                <h2 id="city-name" class="place__city"></h2>
+                <p id="city-region" class="place__region"></p>
+              </div>
+              <div class="localtime">
+                <span class="localtime__icon" data-icon="clock"></span>
+                <div>
+                  <time id="local-time" class="localtime__value"></time>
+                  <p id="local-zone" class="localtime__zone"></p>
+                </div>
+              </div>
+            </div>
+            <div class="hero-card__main">
+              <div class="temp" aria-label="Temperature in degrees Celsius">
+                <span id="temp-value" class="temp__value"></span><span class="temp__unit">°C</span>
+              </div>
+              <div class="condition">
+                <img id="condition-icon" class="condition__icon" alt="" width="96" height="96" decoding="async" hidden>
+                <p id="condition-text" class="condition__text"></p>
+              </div>
+            </div>
+          </section>
+
+          <section id="score-card" class="card score-card" aria-labelledby="score-title" data-tone="good">
+            <p class="eyebrow">Sky personality</p>
+            <div class="score-body">
+              <span id="score-badge" class="score-badge" aria-hidden="true"></span>
+              <div class="score-text">
+                <h3 id="score-title" class="score-title"></h3>
+                <p id="score-description" class="score-description"></p>
+              </div>
+            </div>
+            <div class="score-meta">
+              <p id="score-basis" class="score-basis"></p>
+              <p class="score-note">Application-generated interpretation — not a real credit score.</p>
+            </div>
+          </section>
+        </div>
+
+        <dl id="metrics" class="metrics refreshable" aria-label="Key metrics"></dl>
+        <dl id="details" class="details refreshable" aria-label="More weather details"></dl>
+
+        <section class="card viewer refreshable" aria-labelledby="viewer-title">
+          <div class="viewer__bar">
+            <div>
+              <h3 id="viewer-title" class="viewer__title">API response</h3>
+              <p class="viewer__sub">Live JSON from WeatherAPI <code>/v1/current.json</code></p>
+            </div>
+            <div class="viewer__controls">
+              <div class="tabs" role="tablist" aria-label="JSON view">
+                <button id="tab-formatted" class="tab" type="button" role="tab" data-view="formatted"
+                        aria-selected="true" aria-controls="json-panel">Formatted</button>
+                <button id="tab-raw" class="tab" type="button" role="tab" data-view="raw"
+                        aria-selected="false" aria-controls="json-panel" tabindex="-1">Raw</button>
+              </div>
+              <button id="copy-json" class="btn btn--ghost" type="button">
+                <span class="btn__icon" data-icon="copy"></span>
+                <span id="copy-label">Copy</span>
+              </button>
+            </div>
+          </div>
+          <div id="json-panel" class="viewer__panel" role="tabpanel" aria-labelledby="tab-formatted" tabindex="0">
+            <pre id="json-pre" class="json"><code id="json-code"></code></pre>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <p>Live data by <a href="https://www.weatherapi.com/" target="_blank" rel="noopener noreferrer">WeatherAPI.com</a></p>
+      <p>The sky personality is an application-generated interpretation — not a real credit score.</p>
+    </footer>
+  </div>
+
+  <div id="sr-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+  <noscript><p class="noscript">SKY CRED needs JavaScript to fetch live weather.</p></noscript>
+</body>
+</html>

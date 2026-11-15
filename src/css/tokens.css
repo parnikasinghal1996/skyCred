@@ -1,0 +1,42 @@
+/* Design tokens — the only place raw colours, radii and type stacks are defined. */
+:root {
+  color-scheme: dark;
+
+  /* surfaces */
+  --bg-top: #0e1630;
+  --bg-bottom: #060912;
+  --surface: #111a31;
+  --surface-2: #17223f;
+  --surface-sunken: #0a1122;
+  --border: rgba(150, 175, 230, 0.16);
+  --border-strong: rgba(150, 175, 230, 0.32);
+
+  /* text (all pass WCAG AA on --surface) */
+  --text: #eef3ff;
+  --text-muted: #a3b2d4;
+  --text-faint: #8596bb;
+
+  /* brand */
+  --accent: #5ac8fa;
+  --accent-ink: #04101f; /* dark text on accent fills */
+  --brand-gradient: linear-gradient(135deg, #5ac8fa 0%, #7aa2ff 55%, #8b7cff 100%);
+
+  /* feedback */
+  --danger: #ff7a8a;
+  --danger-soft: rgba(255, 122, 138, 0.12);
+  --danger-border: rgba(255, 122, 138, 0.42);
+
+  /* shape & depth */
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 18px 40px -18px rgba(0, 0, 0, 0.65);
+
+  /* type */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* layout */
+  --content-max: 1040px;
+  --gutter: clamp(16px, 4vw, 32px);
+}
