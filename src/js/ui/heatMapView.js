@@ -247,8 +247,13 @@ export function createHeatMapView({ sampler, preferences, announce }) {
       parts.push(`coolest ${round1(stats.min.value)}°C ${near(stats.min.point)}`);
       parts.push(`average ${round1(stats.mean)}°C`);
     } else {
-      parts.push(`Worst air: ${layer.format(stats.max.value)} ${near(stats.max.point)}`);
-      parts.push(`best: ${layer.format(stats.min.value)} ${near(stats.min.point)}`);
+      if (stats.min.value === stats.max.value) {
+        // the level is coarse, so a whole region often shares one — say that instead of "worst = best"
+        parts.push(`${layer.format(stats.max.value)} across the whole region`);
+      } else {
+        parts.push(`Worst air: ${layer.format(stats.max.value)} ${near(stats.max.point)}`);
+        parts.push(`best: ${layer.format(stats.min.value)} ${near(stats.min.point)}`);
+      }
       const pm = summarize(readings, (point) => point.pm25);
       if (pm.count) parts.push(`PM2.5 ${round1(pm.min.value)}–${round1(pm.max.value)} µg/m³`);
     }
