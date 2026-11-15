@@ -2,6 +2,8 @@
 
 > Check the sky's credit score before you step out.
 
+**Live:** https://skycred-indol.vercel.app
+
 Search any city, see its live weather, and get a plain-language "sky personality" that says whether it's a good moment to step outside. Plain HTML, CSS and vanilla JavaScript — no framework, no runtime dependencies, no backend. Weather comes live from [WeatherAPI.com](https://www.weatherapi.com/) (`/v1/current.json`).
 
 > The sky personality is an application-generated interpretation — **not a real credit score**.
@@ -99,7 +101,7 @@ tests/                  unit tests; fixtures are real WeatherAPI responses
 | --- | --- |
 | `WEATHER_API_KEY` | your WeatherAPI key |
 
-With the GitHub repository connected to the Vercel project, every push to `main` deploys to production and every other branch gets a preview URL.
+Once the GitHub repository is connected to the Vercel project (Project → Settings → Git, which needs the [Vercel GitHub app](https://github.com/apps/vercel) installed on the account), every push to `main` deploys to production and every other branch gets a preview URL.
 
 ## Security note
 

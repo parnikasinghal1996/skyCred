@@ -150,14 +150,26 @@ Checked in a resized browser pane (emulation), not on physical devices.
 | Responsiveness | ✅ | See FR-09. |
 | Scalability | ✅ | Logic is framework-free, DOM-free and unit-tested; components talk only to the store. |
 
+## Deployment (Vercel)
+
+| Item | Status | Evidence |
+| --- | --- | --- |
+| App deployed to production | ✅ | https://skycred-indol.vercel.app — public, HTTP 200 with no login. Vercel project `skycred`; Vercel itself ran `npm run build` using the project's `WEATHER_API_KEY` variable, so the build path is the same one a Git deploy uses. |
+| Verified on the live URL | ✅ | Mumbai loaded on launch (one `fetch`, 200); Delhi chip → `q=Delhi, India` → Delhi, India 26.6 °C; typed "Tokyo" + Enter → Tokyo, Japan; an invalid city → **City not found** with Tokyo kept on screen. Production CSP and security headers are served, and the console held nothing but the browser's own note for the deliberate 400. |
+| Deploys automatically on every push to GitHub | ❌ not active | Vercel refused to link the repo: *"To link a GitHub repository, you need to install the GitHub integration first."* The Vercel account has no GitHub connection and a token cannot create one (it needs a one-time OAuth / app install by the account owner). The live deployment was therefore created by uploading the repo's tracked files through Vercel's API, so **a push to GitHub does not redeploy yet**. |
+| Other `*.vercel.app` addresses | note | The team alias and the per-deployment URLs sit behind Vercel's default Standard Deployment Protection (they redirect to a Vercel login). The public address is the `skycred-indol` one. Protection settings were not changed. |
+
+To turn on deploy-on-push: install the Vercel GitHub app for `parnikasinghal1996` and connect GitHub to the Vercel account, then link the repo (Project → Settings → Git, or one API call).
+
 ## Out of scope
 
 None of it was built: accounts, database, profiles, history, forecasts, push notifications, payments, admin dashboard, backend services.
 
 ## Not done / open
 
-1. **Visual fidelity to the reference screenshot — not verified.** The PRD refers to an attached screenshot, but none came through, so the visual design is original (dark, "credit-app" look). It needs a comparison once the screenshot is shared.
-2. **Safari, Firefox and Edge** were not tested (see above).
-3. **A real offline state and a real quota-exceeded response** were not reproduced (injected / documented bodies were used instead).
-4. **No automated browser tests are checked in.** Logic is covered by `npm test`; the browser checks above were driven by hand during this session.
-5. **The three extra personalities** (Hazy Mode, Layer Up, Warm Spell) and the **Delhi country hint** are interpretation calls the product team should confirm.
+1. **Automatic deployment on push is not set up** — see "Deployment (Vercel)". The app is live, but redeploying currently means re-running the upload, until the GitHub ↔ Vercel connection is made.
+2. **Visual fidelity to the reference screenshot — not verified.** The PRD refers to an attached screenshot, but none came through, so the visual design is original (dark, "credit-app" look). It needs a comparison once the screenshot is shared.
+3. **Safari, Firefox and Edge** were not tested (see above).
+4. **A real offline state and a real quota-exceeded response** were not reproduced (injected / documented bodies were used instead).
+5. **No automated browser tests are checked in.** Logic is covered by `npm test`; the browser checks above were driven by hand during this session.
+6. **The three extra personalities** (Hazy Mode, Layer Up, Warm Spell) and the **Delhi country hint** are interpretation calls the product team should confirm.
