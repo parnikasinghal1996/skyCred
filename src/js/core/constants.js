@@ -31,3 +31,18 @@ export const WEATHER_API_DEFAULT_BASE_URL = 'https://api.weatherapi.com/v1';
 
 /** A request that has not finished after this long is reported as a timeout (with Retry). */
 export const REQUEST_TIMEOUT_MS = 15000;
+
+/**
+ * Place suggestions come from Open-Meteo's free geocoder, not WeatherAPI: checked against both, WeatherAPI's
+ * search is a fuzzy full-name matcher (typing "mum" → Mumias, "pun" → Punia Airport, "tok" → Torokina Airport)
+ * and surfaced the expected city for only 13 of 22 common prefixes, against 20 of 22 for Open-Meteo.
+ * Weather and air quality still come only from WeatherAPI.
+ */
+export const GEOCODING_BASE_URL = 'https://geocoding-api.open-meteo.com/v1';
+export const GEOCODING_TIMEOUT_MS = 8000;
+export const SUGGESTION_DEBOUNCE_MS = 220;
+export const SUGGESTION_MIN_CHARS = 2;
+export const SUGGESTION_COUNT = 6;
+
+/** A looked-up place must land within this distance of the suggestion that was chosen. */
+export const PLACE_MATCH_MAX_KM = 50;

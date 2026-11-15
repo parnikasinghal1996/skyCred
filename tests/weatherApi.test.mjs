@@ -34,6 +34,28 @@ test('FR-10: calls GET /current.json with the key and city as query parameters',
   assert.equal(init.cache, 'no-store'); // always fresh data
 });
 
+test('air quality is requested by default (aqi=yes) and can be switched off per client or per call', async () => {
+  const ask = async (clientOptions, callOptions) => {
+    const fetchImpl = recordingFetch(async () => reply(200, await fixture('current-mumbai-aqi.json')));
+    await createWeatherClient({ apiKey: 'test-key', fetchImpl, ...clientOptions }).getCurrent('Mumbai', callOptions);
+    return fetchImpl.calls[0].url.searchParams.get('aqi');
+  };
+  assert.equal(await ask({}, {}), 'yes');
+  assert.equal(await ask({ includeAirQuality: false }, {}), null);
+  assert.equal(await ask({}, { aqi: false }), null);
+  assert.equal(await ask({ includeAirQuality: false }, { aqi: true }), 'yes');
+});
+
+test('a response with air_quality is accepted unchanged, and one without it is accepted too', async () => {
+  const withAqi = await fixture('current-mumbai-aqi.json');
+  const result = await clientWith(recordingFetch(async () => reply(200, withAqi))).getCurrent('Mumbai');
+  assert.equal(result.rawText, withAqi);
+  assert.equal(result.data.current.air_quality['us-epa-index'], 4);
+
+  const withoutAqi = await fixture('current-mumbai.json'); // places with no AQI data simply omit the block
+  assert.equal(isValidCurrentWeather(JSON.parse(withoutAqi)), true);
+});
+
 test('city names are trimmed and URL-encoded', async () => {
   const fetchImpl = recordingFetch(async () => reply(200, await fixture('current-london.json')));
   await clientWith(fetchImpl).getCurrent('  New York, NY & co  ');

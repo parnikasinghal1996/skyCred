@@ -5,7 +5,7 @@
 import { normalizeCity, weatherMatchesCity } from '../core/cities.js';
 import { h } from './dom.js';
 
-export function createSearchControls({ form, input, message, chipList, cities, initialValue, onSearch }) {
+export function createSearchControls({ form, input, message, chipList, cities, initialValue, onSearch, beforeSearch = () => {} }) {
   input.value = initialValue; // FR-01: the box shows the default city
 
   let shownValidation = null;
@@ -27,6 +27,7 @@ export function createSearchControls({ form, input, message, chipList, cities, i
     button.addEventListener('click', () => {
       input.value = city; // FR-03.3: keep the search box in sync with the chip
       hideMessage();
+      beforeSearch(); // close the suggestion list
       onSearch(city);
     });
     chipList.append(h('li', null, button));
@@ -38,6 +39,7 @@ export function createSearchControls({ form, input, message, chipList, cities, i
     event.preventDefault();
     const value = input.value.trim();
     input.value = value; // the box keeps the searched city
+    beforeSearch(); // close the suggestion list
     onSearch(value);
   });
 

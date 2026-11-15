@@ -2,6 +2,7 @@
  * Renders the weather hero, sky personality, metric cards and secondary details (FR-04/05/06).
  * Every value is written from the API response via the view model — index.html holds only labels.
  */
+import { nearbyNote } from '../core/places.js';
 import { getWeatherPersonality } from '../core/personality.js';
 import { toViewModel } from '../core/viewModel.js';
 import { byId, h } from './dom.js';
@@ -11,6 +12,7 @@ export function createWeatherView() {
   const el = {
     city: byId('city-name'),
     region: byId('city-region'),
+    note: byId('city-note'),
     localTime: byId('local-time'),
     zone: byId('local-zone'),
     temperature: byId('temp-value'),
@@ -78,6 +80,13 @@ export function createWeatherView() {
     el.city.textContent = viewModel.city;
     el.region.textContent = viewModel.place;
     el.region.hidden = viewModel.place === '';
+
+    // Picked from the suggestions, but WeatherAPI only had a nearby point with another name? Say so.
+    const nearby = nearbyNote(weather.place, weather.data.location);
+    el.note.hidden = !nearby;
+    if (nearby) {
+      el.note.textContent = `Nearest weather point to ${nearby.placeName}${nearby.km === null ? '' : ` · about ${nearby.km} km away`}`;
+    }
     el.localTime.textContent = viewModel.localTime;
     el.localTime.setAttribute('datetime', viewModel.localTimeAttribute);
     el.zone.textContent = viewModel.timezone;

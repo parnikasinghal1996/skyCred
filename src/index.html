@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/map.css">
   <script type="module" src="js/main.js"></script>
 </head>
 <body>
@@ -34,7 +35,12 @@
           <input id="city-input" class="search-field__input" type="search" name="city"
                  placeholder="Search any city" autocomplete="off" autocapitalize="words"
                  spellcheck="false" enterkeyhint="search" maxlength="100"
+                 role="combobox" aria-autocomplete="list" aria-haspopup="listbox"
+                 aria-expanded="false" aria-controls="suggestions"
                  aria-describedby="search-message">
+          <span id="suggest-spinner" class="spinner search-field__spinner" aria-hidden="true" hidden></span>
+          <!-- Place suggestions for the text typed so far -->
+          <ul id="suggestions" class="suggestions" role="listbox" aria-label="Suggested places" hidden></ul>
         </div>
         <button id="search-button" class="btn btn--primary" type="submit">Search</button>
       </form>
@@ -43,6 +49,14 @@
       <div class="chips-block">
         <p id="chips-label" class="chips-label">Popular cities</p>
         <ul id="popular-cities" class="chips" aria-labelledby="chips-label"></ul>
+      </div>
+
+      <div class="options">
+        <label class="switch">
+          <input id="aqi-toggle" class="switch__input" type="checkbox" role="switch">
+          <span class="switch__track" aria-hidden="true"></span>
+          <span class="switch__label">Show air quality (AQI)</span>
+        </label>
       </div>
     </section>
 
@@ -109,6 +123,7 @@
                 <p class="eyebrow"><span class="eyebrow__icon" data-icon="map-pin"></span>Current weather</p>
                 <h2 id="city-name" class="place__city"></h2>
                 <p id="city-region" class="place__region"></p>
+                <p id="city-note" class="place__note" hidden></p>
               </div>
               <div class="localtime">
                 <span class="localtime__icon" data-icon="clock"></span>
@@ -146,7 +161,68 @@
         </div>
 
         <dl id="metrics" class="metrics refreshable" aria-label="Key metrics"></dl>
+
+        <!-- Air quality: shown while the "Show air quality (AQI)" switch is on -->
+        <section id="aqi-card" class="card aqi-card refreshable" aria-labelledby="aqi-title" data-level="0" hidden>
+          <div class="aqi-card__head">
+            <div class="aqi-card__summary">
+              <p class="eyebrow"><span class="eyebrow__icon" data-icon="activity"></span>Air quality</p>
+              <h3 id="aqi-title" class="aqi-title"></h3>
+              <p id="aqi-range" class="aqi-range"></p>
+            </div>
+            <div id="aqi-badge" class="aqi-badge" aria-hidden="true">
+              <span id="aqi-level" class="aqi-badge__level"></span>
+              <span class="aqi-badge__of">of 6</span>
+            </div>
+          </div>
+          <div id="aqi-body" class="aqi-body">
+            <div id="aqi-scale" class="aqi-scale" role="img"></div>
+            <p id="aqi-advice" class="aqi-advice"></p>
+            <dl id="aqi-pollutants" class="pollutants" aria-label="Pollutant concentrations"></dl>
+            <p id="aqi-note" class="aqi-note"></p>
+          </div>
+          <p id="aqi-unavailable" class="aqi-unavailable" hidden>Air quality data isn't available for this location right now.</p>
+        </section>
+
         <dl id="details" class="details refreshable" aria-label="More weather details"></dl>
+
+        <!-- Regional heat map: WeatherAPI readings sampled on a lattice around the place, drawn over a map -->
+        <section id="heat-card" class="card heat-card refreshable" aria-labelledby="heat-title">
+          <div class="heat__bar">
+            <div>
+              <h3 id="heat-title" class="heat__title">Regional heat map</h3>
+              <p id="heat-sub" class="heat__sub"></p>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Heat map layer">
+              <button id="layer-temperature" class="tab" type="button" role="tab" data-layer="temperature"
+                      aria-selected="true" aria-controls="heat-stage">Temperature</button>
+              <button id="layer-aqi" class="tab" type="button" role="tab" data-layer="aqi"
+                      aria-selected="false" aria-controls="heat-stage" tabindex="-1">Air quality</button>
+            </div>
+          </div>
+          <div id="heat-stage" class="heat__stage" role="tabpanel" aria-labelledby="layer-temperature">
+            <div id="heat-map" class="heat__map" aria-label="Map with a heat overlay for the selected region"></div>
+            <div id="heat-status" class="heat__status" hidden>
+              <div class="heat__status-inner">
+                <span id="heat-spinner" class="spinner" aria-hidden="true"></span>
+                <span id="heat-status-text" role="status"></span>
+                <button id="heat-retry" class="btn btn--small" type="button" hidden>Retry</button>
+              </div>
+            </div>
+          </div>
+          <div id="heat-legend" class="heat__legend"></div>
+          <p id="heat-summary" class="heat__summary"></p>
+          <details class="heat__data">
+            <summary>View the data points behind the map</summary>
+            <div class="table-wrap">
+              <table class="data-table">
+                <caption class="sr-only">WeatherAPI readings used for the heat map</caption>
+                <thead id="heat-data-head"></thead>
+                <tbody id="heat-data-body"></tbody>
+              </table>
+            </div>
+          </details>
+        </section>
 
         <section class="card viewer refreshable" aria-labelledby="viewer-title">
           <div class="viewer__bar">

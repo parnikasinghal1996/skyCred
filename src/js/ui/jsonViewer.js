@@ -5,6 +5,7 @@
  *   Raw       = the response body exactly as received (WeatherAPI's own text, untouched)
  */
 import { byId } from './dom.js';
+import { createTabs } from './tabs.js';
 
 // strings (optionally followed by ":" → object key) | true/false | null | numbers
 const TOKEN = /("(?:\\.|[^"\\])*")(\s*:)?|\b(?:true|false)\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g;
@@ -89,32 +90,13 @@ export function createJsonViewer({ announce }) {
     el.panel.scrollLeft = 0;
   }
 
-  function select(view) {
+  function showView(view) {
     state.view = view;
-    for (const tab of el.tabs) {
-      const active = tab.dataset.view === view;
-      tab.setAttribute('aria-selected', String(active));
-      tab.tabIndex = active ? 0 : -1;
-    }
     el.panel.setAttribute('aria-labelledby', view === 'raw' ? 'tab-raw' : 'tab-formatted');
     paint();
   }
 
-  el.tabs.forEach((tab, index) => {
-    tab.addEventListener('click', () => select(tab.dataset.view));
-    tab.addEventListener('keydown', (event) => {
-      const last = el.tabs.length - 1;
-      let next = null;
-      if (event.key === 'ArrowRight') next = index === last ? 0 : index + 1;
-      else if (event.key === 'ArrowLeft') next = index === 0 ? last : index - 1;
-      else if (event.key === 'Home') next = 0;
-      else if (event.key === 'End') next = last;
-      if (next === null) return;
-      event.preventDefault();
-      el.tabs[next].focus();
-      select(el.tabs[next].dataset.view);
-    });
-  });
+  createTabs({ tabs: el.tabs, onSelect: (tab) => showView(tab.dataset.view) });
 
   function flashCopyResult(ok) {
     clearTimeout(resetTimer);
